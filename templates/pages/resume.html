@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Resume{% endblock %}
+{% block head_extra %}
+<link href="{{ url_for('static', filename='../css/web.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<h1>Resume</h1>
+
+<section>
+    <h2>About Me</h2>
+    <p>Born in Buchach at 2006</p>
+</section>
+
+<section>
+    <h2>Education</h2>
+    <p>Studying at university 3 grade</p>
+</section>
+
+<section>
+    <h2>Skills</h2>
+    <ul>
+        <li>Python</li>
+        <li>Flask</li>
+        <li>HTML/CSS</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Technologies</h2>
+    <p>Bootstrap, Git, Docker...</p>
+</section>
+
+<section>
+    <h2>Projects</h2>
+    <p>Flask project simple routing</p>
+</section>
+
+<img src="{{ url_for('static', filename='images/logo.png') }}" alt="Photo" class="img-fluid" />
+{% endblock %}

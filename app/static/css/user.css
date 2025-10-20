@@ -1,0 +1,25 @@
+/* Make the navbar vertical for this style (important) */
+.navbar-nav {
+    flex-direction: column !important;
+    width: 100%;
+}
+
+.navbar-nav .nav-item {
+    width: 100%;
+}
+
+.navbar-nav .nav-link {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.navbar-collapse {
+    align-items: flex-end !important;
+}
+
+@media (min-width: 992px) {
+    .navbar-nav {
+        flex-direction: column !important;
+    }
+}

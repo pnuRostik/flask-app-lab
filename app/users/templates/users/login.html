@@ -1,19 +1,42 @@
 {% extends "base.html" %}
+{% from 'form_macros.html' import render_field %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Вхід в систему{% endblock %}
 
 {% block content %}
-<h2>Login</h2>
-<form method="POST" action="{{ url_for('users_bp.login') }}">
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="username" name="username" required>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0 text-center">Вхід в систему</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.csrf_token }}
+
+                        {{ render_field(form.username) }}
+
+                        {{ render_field(form.password) }}
+
+                        <div class="mb-3 form-check">
+                            {{ form.remember(class="form-check-input") }}
+                            {{ form.remember.label(class="form-check-label") }}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </form>
+
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">
+                            Тестові дані: user1 / pass123
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Пароль</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
-<p>DATA: USERNAME: {{ username }}, PASSWORD: {{ password }}</p>
+</div>
 {% endblock %}

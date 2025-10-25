@@ -1,7 +1,12 @@
 from flask import request, redirect, url_for, render_template, flash, session, make_response
 from datetime import datetime, timedelta
+import logging
 
 from . import users_bp
+from .forms import ContactForm, LoginForm
+
+# Set up logger for this module
+logger = logging.getLogger(__name__)
 
 VALID_USERNAME = "user1"
 VALID_PASSWORD = "pass123"
@@ -16,22 +21,33 @@ def greetings(name):
 
 @users_bp.route("/login", methods=["GET", "POST"])
 def login():
+    # Перевіряємо чи користувач вже авторизований
     if "username" in session:
         return redirect(url_for("users_bp.profile"))
 
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        remember = form.remember.data
 
         if username == VALID_USERNAME and password == VALID_PASSWORD:
             session["username"] = username
-            flash("Успішний вхід в систему!", "success")
+            
+            remember_msg = " (запам'ятано)" if remember else ""
+            flash(f"Успішний вхід в систему{remember_msg}!", "success")
+            
             return redirect(url_for("users_bp.profile"))
         else:
             flash("Невірне ім'я користувача або пароль", "error")
             return redirect(url_for("users_bp.login"))
+    
+    if request.method == "POST" and not form.validate():
+        flash("Будь ласка, виправте помилки у формі", "error")
+        return redirect(url_for("users_bp.login"))
 
-    return render_template("users/login.html", username=VALID_USERNAME, password=VALID_PASSWORD, show_navbar=False)
+    return render_template("users/login.html", form=form, show_navbar=False)
 
 
 @users_bp.route("/profile", methods=["GET", "POST"])
@@ -101,6 +117,32 @@ def change_theme(theme):
         flash("Невірна тема", "error")
     
     return redirect(url_for("users_bp.profile"))
+
+
+@users_bp.route("/contact", methods=["GET", "POST"])
+def contact():
+    form = ContactForm()
+    
+    if form.validate_on_submit():
+        name = form.name.data
+        email = form.email.data
+        phone = form.phone.data
+        subject = form.subject.data
+        message = form.message.data
+        
+        # Log the contact form submission
+        logger.info(
+            f"Contact form submitted - Name: {name}, Email: {email}, "
+            f"Phone: {phone}, Subject: {subject}, Message length: {len(message)} chars"
+        )
+        
+        flash(f"Дякуємо за ваше повідомлення, {name} {email}! Ми зв'яжемося з вами найближчим часом.", "success")
+        return redirect(url_for("users_bp.profile"))
+    
+    # Log form validation errors if POST request
+    if request.method == "POST" and not form.validate():
+        flash("Будь ласка, виправте помилки у формі", "error")
+    return render_template("users/contact.html", form=form)
 
 @users_bp.route("/admin")
 def admin():

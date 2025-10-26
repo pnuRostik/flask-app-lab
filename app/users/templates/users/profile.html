@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Profile Page</h2>
+    <p>Ласкаво просимо, {{ username }}!</p>
+
+    <!-- Theme Selection -->
+    <div class="mb-3">
+        <h5>Кольорова схема:</h5>
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('users_bp.change_theme', theme='light') }}"
+                class="btn {{ 'btn-primary' if theme == 'light' else 'btn-outline-primary' }}">
+                ☀️ Світла тема
+            </a>
+            <a href="{{ url_for('users_bp.change_theme', theme='dark') }}"
+                class="btn {{ 'btn-primary' if theme == 'dark' else 'btn-outline-primary' }}">
+                🌙 Темна тема
+            </a>
+        </div>
+        <small class="text-muted">Поточна тема: {{ theme }}</small>
+    </div>
+
+
+    <!-- Cookie Management Section -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h4>Управління Cookies</h4>
+
+            <!-- Add Cookie Form -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Додати Cookie</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="action" value="add_cookie">
+                        <div class="mb-3">
+                            <label for="cookie_key" class="form-label">Ключ:</label>
+                            <input type="text" class="form-control" id="cookie_key" name="cookie_key" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cookie_value" class="form-label">Значення:</label>
+                            <input type="text" class="form-control" id="cookie_value" name="cookie_value" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expiry_days" class="form-label">Термін дії (днів):</label>
+                            <input type="number" class="form-control" id="expiry_days" name="expiry_days" value="30"
+                                min="1" max="365">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Додати Cookie</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Cookie Form -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Видалити Cookie</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="action" value="delete_cookie">
+                        <div class="mb-3">
+                            <label for="delete_cookie_key" class="form-label">Ключ для видалення:</label>
+                            <input type="text" class="form-control" id="delete_cookie_key" name="cookie_key" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Видалити Cookie</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete All Cookies -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Видалити всі Cookies</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" onsubmit="return confirm('Ви впевнені, що хочете видалити всі cookies?')">
+                        <input type="hidden" name="action" value="delete_all_cookies">
+                        <button type="submit" class="btn btn-danger">Видалити всі Cookies</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Поточні Cookies</h4>
+            <div class="card">
+                <div class="card-body">
+                    {% if cookies %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Ключ</th>
+                                    <th>Значення</th>
+                                    <th>Дія</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cookie in cookies %}
+                                <tr>
+                                    <td>{{ cookie.key }}</td>
+                                    <td>{{ cookie.value }}</td>
+                                    <td>
+                                        <form method="POST" style="display: inline;"
+                                            onsubmit="return confirm('Видалити цей cookie?')">
+                                            <input type="hidden" name="action" value="delete_cookie">
+                                            <input type="hidden" name="cookie_key" value="{{ cookie.key }}">
+                                            <button type="submit"
+                                                class="btn btn-sm btn-outline-danger">Видалити</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Немає збережених cookies</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="mt-4">
+        <a href="{{ url_for('users_bp.logout') }}" class="btn btn-danger">Вийти</a>
+    </div>
+</div>
+{% endblock %}

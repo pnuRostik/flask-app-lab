@@ -1,3 +1,9 @@
 
 2025-10-25 17:24:33,197 - app.users.views - INFO - Contact form submitted - Name: Прикарпатс, Email: pomoju.boje@gmail.com, Phone: +380971302146, Subject: billing, Message length: 11 chars
 2025-10-25 17:28:14,762 - werkzeug - WARNING -  * Debugger is active!
+2025-10-26 09:15:04,123 - werkzeug - WARNING -  * Debugger is active!
+2025-10-26 09:16:40,520 - werkzeug - WARNING -  * Debugger is active!
+2025-10-28 09:43:18,795 - werkzeug - WARNING -  * Debugger is active!
+2025-10-28 09:44:12,941 - werkzeug - WARNING -  * Debugger is active!
+2025-10-28 09:55:09,789 - werkzeug - WARNING -  * Debugger is active!
+2025-10-28 09:57:42,334 - werkzeug - WARNING -  * Debugger is active!

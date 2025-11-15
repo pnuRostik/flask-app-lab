@@ -4,6 +4,9 @@ dnspython==2.8.0
 email-validator==2.3.0
 Flask==3.1.2
 Flask-WTF==1.2.2
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.5
+SQLAlchemy==2.0.44
 gunicorn==23.0.0
 idna==3.11
 itsdangerous==2.2.0

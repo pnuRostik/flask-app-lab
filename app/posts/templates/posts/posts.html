@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Список постів{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('posts_bp.static', filename='css/posts.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Список постів</h1>
+    {% if session.get('username') %}
+    <a href="{{ url_for('posts_bp.create_post') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Post
+    </a>
+    {% endif %}
+</div>
+
+{% if posts %}
+<div class="row">
+    {% for post in posts %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{{ post.title }}</h5>
+                <span class="badge bg-secondary">{{ post.category }}</span>
+            </div>
+            <div class="card-body">
+                <img src="{{ url_for('posts_bp.static', filename='img/default.png') }}" alt="Post image"
+                    class="img-fluid mb-3 post-image">
+                <p class="card-text">{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                <p class="text-muted small">
+                    <strong>Автор:</strong> {{ post.author }}<br>
+                    <strong>Опубліковано:</strong> {{ post.posted.strftime('%d.%m.%Y %H:%M') if post.posted else
+                    'Невідомо' }}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('posts_bp.post_detail', id=post.id) }}" class="btn btn-sm btn-outline-primary">
+                    Детальніше
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <p class="mb-0">Поки що немає жодного поста.
+        {% if session.get('username') %}
+        <a href="{{ url_for('posts_bp.create_post') }}">Створіть перший пост!</a>
+        {% endif %}
+    </p>
+</div>
+{% endif %}
+{% endblock %}

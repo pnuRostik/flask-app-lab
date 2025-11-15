@@ -5,19 +5,24 @@ from .models import Post
 from .forms import PostForm
 from app import db
 from datetime import datetime
-
+from sqlalchemy import select
 
 @posts_bp.route('/post')
 def posts_list():
     """Відображення списку всіх видимих постів за датою публікації (спадання)"""
-    posts = Post.query.filter_by(is_active=True).order_by(Post.posted.desc()).all()
+    stmt = (
+        select(Post)
+        .where(Post.is_active == True)
+        .order_by(Post.posted.desc())
+    )
+    posts = db.session.scalars(stmt).all()
     return render_template('posts/posts.html', posts=posts)
 
 
 @posts_bp.route('/post/<int:id>')
 def post_detail(id):
     """Перегляд конкретного поста"""
-    post = Post.query.get_or_404(id)
+    post = db.get_or_404(Post, id)
     if not post.is_active:
         flash('Пост не знайдено', 'error')
         return redirect(url_for('posts_bp.posts_list'))
@@ -65,7 +70,7 @@ def create_post():
 @posts_bp.route('/post/<int:id>/update', methods=['GET', 'POST'])
 def update_post(id):
     """Редагування поста"""
-    post = Post.query.get_or_404(id)
+    post = db.get_or_404(Post, id)
     form = PostForm(obj=post)
     
     
@@ -103,7 +108,7 @@ def update_post(id):
 @posts_bp.route('/post/<int:id>/delete', methods=['GET', 'POST'])
 def delete_post(id):
     """Видалення поста - GET для підтвердження, POST для видалення"""
-    post = Post.query.get_or_404(id)
+    post = db.get_or_404(Post, id)
     
     if request.method == 'POST':
         try:

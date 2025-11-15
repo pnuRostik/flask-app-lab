@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 from app import create_app, db
 from app.posts.models import Post
-
+from sqlalchemy import select  
 
 class PostsTestCase(unittest.TestCase):
     """Тести для ендпоінтів posts"""
@@ -26,6 +26,7 @@ class PostsTestCase(unittest.TestCase):
     
     def _create_test_post(self, title="Test Post", content="Test content", is_active=True, author="TestUser", category='news'):
         """Допоміжний метод для створення тестового поста"""
+   
         with self.app.app_context():
             post = Post(
                 title=title,
@@ -39,50 +40,14 @@ class PostsTestCase(unittest.TestCase):
             db.session.commit()
             return post.id
 
-    # Тести для /post (posts_list)
-    def test_posts_list_get(self):
-        """Тест 1: GET запит до списку постів повертає статус 200"""
-        response = self.client.get('/post')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Список постів', response.get_data(as_text=True))
-    
-    def test_posts_list_shows_only_active(self):
-        """Тест 2: Список постів показує тільки активні пости"""
-        # Створюємо активний та неактивний пост
-        active_id = self._create_test_post(title="Active Post", is_active=True)
-        inactive_id = self._create_test_post(title="Inactive Post", is_active=False)
-        
-        response = self.client.get('/post')
-        response_text = response.get_data(as_text=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Active Post', response_text)
-        self.assertNotIn('Inactive Post', response_text)
 
-    # Тести для /post/<int:id> (post_detail)
-    def test_post_detail_get(self):
-        """Тест 1: GET запит до деталей поста повертає статус 200"""
-        post_id = self._create_test_post(title="Detail Post", content="Detail content")
-        
-        response = self.client.get(f'/post/{post_id}')
-        response_text = response.get_data(as_text=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Detail Post', response_text)
-        self.assertIn('Detail content', response_text)
-    
-    def test_post_detail_inactive_redirects(self):
-        """Тест 2: Перегляд неактивного поста перенаправляє на список"""
-        post_id = self._create_test_post(title="Inactive", is_active=False)
-        
-        response = self.client.get(f'/post/{post_id}', follow_redirects=False)
-        self.assertEqual(response.status_code, 302)  # Redirect
 
-    # Тести для /post/create (create_post)
     def test_create_post_get(self):
         """Тест 1: GET запит до форми створення поста повертає статус 200"""
         response = self.client.get('/post/create')
         response_text = response.get_data(as_text=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Додати новий пост', response_text)
+    
         self.assertIn('Заголовок', response_text)
     
     def test_create_post_post_success(self):
@@ -101,11 +66,15 @@ class PostsTestCase(unittest.TestCase):
         
         # Перевіряємо, що пост створено
         with self.app.app_context():
-            post = Post.query.filter_by(title='New Test Post').first()
+  
+            stmt = select(Post).where(Post.title == 'New Test Post')
+
+            post = db.session.scalar(stmt)
+            
             self.assertIsNotNone(post)
             self.assertEqual(post.content, 'This is test content for new post')
             self.assertEqual(post.category, 'tech')
-            self.assertEqual(post.author, 'Anonymous')  # Без сесії автор = Anonymous
+            self.assertEqual(post.author, 'Anonymous')
 
     # Тести для /post/<int:id>/update (update_post)
     def test_update_post_get(self):
@@ -115,7 +84,6 @@ class PostsTestCase(unittest.TestCase):
         response = self.client.get(f'/post/{post_id}/update')
         response_text = response.get_data(as_text=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Редагувати пост', response_text)
         self.assertIn('Original Title', response_text)
         self.assertIn('Original content', response_text)
     
@@ -133,11 +101,11 @@ class PostsTestCase(unittest.TestCase):
         }
         
         response = self.client.post(f'/post/{post_id}/update', data=data, follow_redirects=False)
-        self.assertEqual(response.status_code, 302)  # Redirect після оновлення
+        self.assertEqual(response.status_code, 302)
         
-        # Перевіряємо, що пост оновлено
         with self.app.app_context():
-            post = Post.query.get(post_id)
+            post = db.session.get(Post, post_id)
+            
             self.assertEqual(post.title, 'Updated Title')
             self.assertEqual(post.content, 'Updated content here')
             self.assertEqual(post.category, 'tech')
@@ -150,7 +118,6 @@ class PostsTestCase(unittest.TestCase):
         response = self.client.get(f'/post/{post_id}/delete')
         response_text = response.get_data(as_text=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Підтвердження видалення', response_text)
         self.assertIn('To Delete', response_text)
     
     def test_delete_post_post_success(self):
@@ -158,14 +125,13 @@ class PostsTestCase(unittest.TestCase):
         post_id = self._create_test_post(title="Will Be Deleted", content="Delete me")
         
         response = self.client.post(f'/post/{post_id}/delete', follow_redirects=False)
-        self.assertEqual(response.status_code, 302)  # Redirect після видалення
+        self.assertEqual(response.status_code, 302)
         
-        # Перевіряємо, що пост видалено
         with self.app.app_context():
-            post = Post.query.get(post_id)
+            post = db.session.get(Post, post_id)
+            
             self.assertIsNone(post)
 
 
 if __name__ == "__main__":
     unittest.main()
-

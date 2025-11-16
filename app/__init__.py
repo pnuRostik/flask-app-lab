@@ -1,38 +1,73 @@
 import os
-from flask import Flask
+import logging
+from flask import Flask, render_template
 from dotenv import load_dotenv
+from .config import config_map
+from sqlalchemy.orm import DeclarativeBase
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from sqlalchemy import MetaData
 
-# Load variables from .flaskenv file
+# Load variables from .flaskenv or .env
 load_dotenv()
 
-app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
-app.config.from_object('config')
+class Base(DeclarativeBase):
+    metadata = MetaData(naming_convention={
+        "ix": 'ix_%(column_0_label)s',
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s"
+    })
+
+db = SQLAlchemy(model_class=Base)
+migrate = Migrate()
 
 
-import logging
+def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flask:
+    app = Flask(__name__)
 
-# Configure logging for the application
-logging.basicConfig(
-    filename="contact_form.log",  
-    level=logging.INFO,           
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    encoding="utf-8"
-)
+    # Secret key
+    app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
-# Reduce noise from other libraries
-logging.getLogger('werkzeug').setLevel(logging.WARNING)
-logging.getLogger('urllib3').setLevel(logging.WARNING)
-logging.getLogger('requests').setLevel(logging.WARNING)
+    # Load config.py
+    app.config.from_object(config_map[config_name])
 
-# Create logger for this module
-logger = logging.getLogger(__name__)
+    db.init_app(app)
+    migrate.init_app(app, db)
 
 
-from . import views
+    # ------------------ LOGGING ------------------
+    logging.basicConfig(
+        filename="contact_form.log",
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        encoding="utf-8"
+    )
 
-from .users import users_bp
-from .products import products_bp
+    logging.getLogger('werkzeug').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+    logging.getLogger('requests').setLevel(logging.WARNING)
 
-app.register_blueprint(users_bp)
-app.register_blueprint(products_bp)
+    logger = logging.getLogger(__name__)
+    # ---------------------------------------------
+
+    # Import blueprints
+    with app.app_context(): 
+        from .users import users_bp
+        from .products import products_bp
+        from .posts import posts_bp
+        from .views import main_bp    
+        from .models import User
+        from .posts.models import Post, Tag
+        # Register blueprints
+        app.register_blueprint(main_bp)
+        app.register_blueprint(users_bp)
+        app.register_blueprint(products_bp)
+        app.register_blueprint(posts_bp)
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html'), 404
+
+    return app

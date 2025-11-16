@@ -141,7 +141,7 @@ def contact():
     
     # Log form validation errors if POST request
     if request.method == "POST" and not form.validate():
-        flash("Будь ласка, виправте помилки у формі", "error")
+        flash("Будь ласка, виправте помилки у формі", "danger")
     return render_template("users/contact.html", form=form)
 
 @users_bp.route("/admin")

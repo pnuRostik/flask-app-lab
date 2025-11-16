@@ -1,12 +1,28 @@
 """Flask-WTF форми"""
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, BooleanField, SelectField, DateTimeField
+from wtforms import StringField, TextAreaField, SubmitField, BooleanField, SelectField, DateTimeField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Optional
 from datetime import datetime
+from app import db
+from app.models import User
+from app.posts.models import Tag
+from sqlalchemy import select
 
 
 class PostForm(FlaskForm):
     """Форма для створення/редагування поста"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        stmt = select(User).order_by(User.id)
+        authors = db.session.scalars(stmt).all()
+        self.author_id.choices = [(a.id, a.username) for a in authors]
+        
+        # Завантажуємо теги для вибору
+        tags_stmt = select(Tag).order_by(Tag.name)
+        tags = db.session.scalars(tags_stmt).all()
+        self.tags.choices = [(str(t.id), t.name) for t in tags]
+
     title = StringField(
         'Заголовок',
         validators=[
@@ -46,4 +62,6 @@ class PostForm(FlaskForm):
         validators=[DataRequired(message='Оберіть категорію')],
         render_kw={"class": "form-select"}
     )
+    author_id = SelectField("Автор", coerce=int, validators=[DataRequired(message='Оберіть автора')], render_kw={"class": "form-select"})
+    tags = SelectMultipleField("Теги", coerce=str, validators=[Optional()], render_kw={"class": "form-select"})
     submit = SubmitField('Зберегти', render_kw={"class": "btn btn-primary"})

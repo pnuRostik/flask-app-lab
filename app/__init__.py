@@ -6,13 +6,19 @@ from .config import config_map
 from sqlalchemy.orm import DeclarativeBase
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
+from sqlalchemy import MetaData
 
 # Load variables from .flaskenv or .env
 load_dotenv()
 
 class Base(DeclarativeBase):
-    pass
+    metadata = MetaData(naming_convention={
+        "ix": 'ix_%(column_0_label)s',
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s"
+    })
 
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
@@ -52,7 +58,8 @@ def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flas
         from .products import products_bp
         from .posts import posts_bp
         from .views import main_bp    
-
+        from .models import User
+        from .posts.models import Post, Tag
         # Register blueprints
         app.register_blueprint(main_bp)
         app.register_blueprint(users_bp)

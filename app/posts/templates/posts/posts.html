@@ -30,7 +30,7 @@
                     class="img-fluid mb-3 post-image">
                 <p class="card-text">{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
                 <p class="text-muted small">
-                    <strong>Автор:</strong> {{ post.author }}<br>
+                    <strong>Автор:</strong> {{ post.user.username if post.user else 'Невідомо' }}<br>
                     <strong>Опубліковано:</strong> {{ post.posted.strftime('%d.%m.%Y %H:%M') if post.posted else
                     'Невідомо' }}
                 </p>

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, DecimalField, SelectField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, Length, NumberRange, Email, Regexp
+from wtforms.validators import DataRequired, Length, NumberRange, Email, Regexp, EqualTo, ValidationError
 
 
 
@@ -94,3 +94,59 @@ class LoginForm(FlaskForm):
         "Увійти",
         render_kw={"class": "btn btn-primary"}
     )
+
+class RegistrationForm(FlaskForm):
+    username = StringField(
+        "Ім'я користувача",
+        validators=[
+            DataRequired(message="Ім'я користувача є обов'язковим"),
+            Length(min=4, max=20, message="Ім'я користувача повинно бути від 4 до 20 символів")
+        ],
+        render_kw={"class": "form-control", "placeholder": "Введіть ім'я користувача"}
+    )
+    
+    email = StringField(
+        "Email",
+        validators=[
+            DataRequired(message="Email є обов'язковим полем"),
+            Email(message="Введіть коректний email адрес")
+        ],
+        render_kw={"class": "form-control", "placeholder": "example@email.com"}
+    )
+    
+    password = PasswordField(
+        "Пароль",
+        validators=[
+            DataRequired(message="Пароль є обов'язковим"),
+            Length(min=6, max=20, message="Пароль повинен бути від 6 до 20 символів")
+        ],
+        render_kw={"class": "form-control", "placeholder": "Введіть пароль"}
+    )
+    
+    password_confirm = PasswordField(
+        "Підтвердження пароля",
+        validators=[
+            DataRequired(message="Підтвердження пароля є обов'язковим"),
+            EqualTo('password', message="Паролі не співпадають")
+        ],
+        render_kw={"class": "form-control", "placeholder": "Підтвердіть пароль"}
+    )
+    
+    submit = SubmitField(
+        "Зареєструватися",
+        render_kw={"class": "btn btn-primary"}
+    )
+    
+    def validate_username(self, username):
+        """Перевірка унікальності імені користувача"""
+        from app.models import User
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError("Користувач з таким ім'ям вже існує")
+    
+    def validate_email(self, email):
+        """Перевірка унікальності email"""
+        from app.models import User
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError("Користувач з таким email вже існує")

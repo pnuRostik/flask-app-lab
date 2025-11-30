@@ -1,8 +1,8 @@
-"""user create
+"""Initial user migration with bcrypt
 
-Revision ID: b8a88c241e12
-Revises: 81b660f3aa89
-Create Date: 2025-11-16 10:04:06.968571
+Revision ID: 35e678675052
+Revises: 
+Create Date: 2025-11-30 18:55:32.377421
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b8a88c241e12'
-down_revision = '81b660f3aa89'
+revision = '35e678675052'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -22,10 +22,10 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=80), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
-    sa.Column('password', sa.String(length=128), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('username')
+    sa.Column('password_hash', sa.String(length=128), nullable=False),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
+    sa.UniqueConstraint('email', name=op.f('uq_users_email')),
+    sa.UniqueConstraint('username', name=op.f('uq_users_username'))
     )
     # ### end Alembic commands ###
 

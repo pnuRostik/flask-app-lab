@@ -51,3 +51,21 @@
 2025-11-16 11:18:56,621 - werkzeug - WARNING -  * Debugger is active!
 2025-11-16 11:19:14,351 - werkzeug - WARNING -  * Debugger is active!
 2025-11-16 11:19:24,913 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 18:55:30,034 - flask_migrate - ERROR - Error: Directory migrations already exists and is not empty
+2025-11-30 18:56:25,860 - app.users.views - INFO - New user registered: testuser (test@example.com)
+2025-11-30 18:56:38,492 - app.users.views - INFO - New user registered: testuser (test@example.com)
+2025-11-30 18:57:01,557 - app.users.views - INFO - New user registered: testuser (test@example.com)
+2025-11-30 19:00:20,063 - app.users.views - INFO - New user registered and logged in: testuser (test@example.com)
+2025-11-30 19:02:43,354 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:02:50,462 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:03:18,079 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:03:44,614 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:05:05,462 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:05:26,080 - app.users.views - WARNING - Failed login attempt: rostyslav.vasylyk.23@pnu.edu.ua
+2025-11-30 19:05:50,307 - app.users.views - INFO - New user registered and logged in: Ростислав (pomoju.boje@gmail.com)
+2025-11-30 19:06:10,369 - app.users.views - INFO - User logged out: Ростислав
+2025-11-30 19:06:13,637 - app.users.views - INFO - User logged in: Ростислав
+2025-11-30 19:06:19,255 - app.users.views - INFO - User logged out: Ростислав
+2025-11-30 19:07:49,193 - app.users.views - INFO - New user registered and logged in: Ростислав1 (pomoju.boje2@gmail.com)
+2025-11-30 19:10:17,197 - app.users.views - INFO - New user registered and logged in: testuser (test@example.com)
+2025-11-30 19:10:30,895 - app.users.views - INFO - New user registered and logged in: testuser (test@example.com)

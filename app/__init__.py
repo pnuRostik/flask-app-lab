@@ -6,6 +6,8 @@ from .config import config_map
 from sqlalchemy.orm import DeclarativeBase
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 from sqlalchemy import MetaData
 
 # Load variables from .flaskenv or .env
@@ -22,6 +24,8 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
+bcrypt = Bcrypt()
+login_manager = LoginManager()
 
 
 def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flask:
@@ -35,6 +39,19 @@ def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flas
 
     db.init_app(app)
     migrate.init_app(app, db)
+    bcrypt.init_app(app)
+    login_manager.init_app(app)
+    
+    # Налаштування Flask-Login
+    login_manager.login_view = 'users_bp.login'
+    login_manager.login_message = 'Будь ласка, увійдіть в систему для доступу до цієї сторінки.'
+    login_manager.login_message_category = 'info'
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        """Завантажує користувача за його ID з бази даних"""
+        from .models import User
+        return db.session.get(User, int(user_id))
 
 
     # ------------------ LOGGING ------------------
@@ -55,16 +72,11 @@ def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flas
     # Import blueprints
     with app.app_context(): 
         from .users import users_bp
-        from .products import products_bp
-        from .posts import posts_bp
         from .views import main_bp    
         from .models import User
-        from .posts.models import Post, Tag
         # Register blueprints
         app.register_blueprint(main_bp)
         app.register_blueprint(users_bp)
-        app.register_blueprint(products_bp)
-        app.register_blueprint(posts_bp)
 
     @app.errorhandler(404)
     def page_not_found(e):

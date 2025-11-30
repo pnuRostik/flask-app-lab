@@ -8,23 +8,22 @@
 
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
             <ul class="navbar-nav mb-2 mb-lg-0">
+                {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('posts_bp.posts_list') }}">Пости</a>
-                </li>
-                {% if session.get('username') %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('posts_bp.create_post') }}">Створити пост</a>
+                    <a class="nav-link" href="{{ url_for('users_bp.profile') }}">Профіль</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('users_bp.profile') }}">Profile ({{ session.get('username')
-                        }})</a>
+                    <a class="nav-link" href="{{ url_for('users_bp.users_list') }}">Користувачі</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('users_bp.logout') }}">Вийти</a>
+                    <a class="nav-link" href="{{ url_for('users_bp.logout') }}">Вихід</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('users_bp.login') }}">Увійти</a>
+                    <a class="nav-link" href="{{ url_for('users_bp.login') }}">Вхід</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('users_bp.register') }}">Реєстрація</a>
                 </li>
                 {% endif %}
                 <li class="nav-item">

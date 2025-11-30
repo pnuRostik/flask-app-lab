@@ -1,15 +1,15 @@
 from flask import request, redirect, url_for, render_template, flash, session, make_response
+from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime, timedelta
 import logging
 
 from . import users_bp
-from .forms import ContactForm, LoginForm
+from .forms import ContactForm, LoginForm, RegistrationForm
+from app.models import User
+from app import db
 
 # Set up logger for this module
 logger = logging.getLogger(__name__)
-
-VALID_USERNAME = "user1"
-VALID_PASSWORD = "pass123"
 
 @users_bp.route("/hi/<name>")
 def greetings(name):
@@ -19,28 +19,72 @@ def greetings(name):
     return render_template("users/hi.html", name=name, age=age)
 
 
+@users_bp.route("/register", methods=["GET", "POST"])
+def register():
+    # Перевіряємо чи користувач вже авторизований
+    if current_user.is_authenticated:
+        return redirect(url_for("users_bp.profile"))
+
+    form = RegistrationForm()
+    
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        
+        # Створюємо нового користувача
+        user = User(username=username, email=email)
+        user.set_password(password)
+        
+        try:
+            db.session.add(user)
+            db.session.commit()
+            # Авторизуємо користувача після реєстрації
+            login_user(user, remember=False)
+            flash("Реєстрація успішна! Ви автоматично увійшли в систему.", "success")
+            logger.info(f"New user registered and logged in: {username} ({email})")
+            return redirect(url_for("users_bp.profile"))
+        except Exception as e:
+            db.session.rollback()
+            flash("Помилка при реєстрації. Спробуйте ще раз.", "error")
+            logger.error(f"Registration error: {str(e)}")
+    
+    if request.method == "POST" and not form.validate():
+        flash("Будь ласка, виправте помилки у формі", "error")
+
+    return render_template("users/register.html", form=form, show_navbar=False)
+
+
 @users_bp.route("/login", methods=["GET", "POST"])
 def login():
     # Перевіряємо чи користувач вже авторизований
-    if "username" in session:
+    if current_user.is_authenticated:
         return redirect(url_for("users_bp.profile"))
 
     form = LoginForm()
     
     if form.validate_on_submit():
-        username = form.username.data
+        username_or_email = form.username.data
         password = form.password.data
         remember = form.remember.data
 
-        if username == VALID_USERNAME and password == VALID_PASSWORD:
-            session["username"] = username
+        # Шукаємо користувача за username або email
+        user = User.query.filter(
+            (User.username == username_or_email) | (User.email == username_or_email)
+        ).first()
+
+        if user and user.check_password(password):
+            # Авторизуємо користувача за допомогою Flask-Login
+            login_user(user, remember=remember)
             
             remember_msg = " (запам'ятано)" if remember else ""
             flash(f"Успішний вхід в систему{remember_msg}!", "success")
+            logger.info(f"User logged in: {user.username}")
             
             return redirect(url_for("users_bp.profile"))
         else:
             flash("Невірне ім'я користувача або пароль", "error")
+            logger.warning(f"Failed login attempt: {username_or_email}")
             return redirect(url_for("users_bp.login"))
     
     if request.method == "POST" and not form.validate():
@@ -51,11 +95,8 @@ def login():
 
 
 @users_bp.route("/profile", methods=["GET", "POST"])
+@login_required
 def profile():
-    if "username" not in session:
-        flash("Ви не авторизовані", "error")
-        return redirect(url_for("users_bp.login"))
-    
     if request.method == "POST":
         action = request.form.get("action")
         
@@ -96,20 +137,20 @@ def profile():
             cookies_data.append({"key": key, "value": value})
     
     current_theme = session.get("theme", "light")
-    return render_template("users/profile.html", username=session["username"], cookies=cookies_data, theme=current_theme)
+    return render_template("users/profile.html", username=current_user.username, cookies=cookies_data, theme=current_theme)
 
 @users_bp.route("/logout")
+@login_required
 def logout():
-    session.pop("username", None)
+    username = current_user.username
+    logout_user()
+    logger.info(f"User logged out: {username}")
     flash("Ви успішно вийшли з системи", "success")
     return redirect(url_for("users_bp.login"))
 
 @users_bp.route("/change-theme/<theme>")
+@login_required
 def change_theme(theme):
-    if "username" not in session:
-        flash("Ви не авторизовані", "error")
-        return redirect(url_for("users_bp.login"))
-    
     if theme in ["light", "dark"]:
         session["theme"] = theme
         flash(f"Тема змінена на {theme}", "success")
@@ -143,6 +184,13 @@ def contact():
     if request.method == "POST" and not form.validate():
         flash("Будь ласка, виправте помилки у формі", "danger")
     return render_template("users/contact.html", form=form)
+
+@users_bp.route("/list")
+@login_required
+def users_list():
+    """Сторінка зі списком всіх користувачів (тільки для авторизованих)"""
+    users = User.query.all()
+    return render_template("users/users_list.html", users=users)
 
 @users_bp.route("/admin")
 def admin():

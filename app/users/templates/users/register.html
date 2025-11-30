@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from 'form_macros.html' import render_field %}
 
-{% block title %}Вхід в систему{% endblock %}
+{% block title %}Реєстрація{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -9,7 +9,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="mb-0 text-center">Вхід в систему</h2>
+                    <h2 class="mb-0 text-center">Реєстрація</h2>
                 </div>
                 <div class="card-body">
                     <form method="POST" novalidate>
@@ -17,12 +17,11 @@
 
                         {{ render_field(form.username) }}
 
+                        {{ render_field(form.email) }}
+
                         {{ render_field(form.password) }}
 
-                        <div class="mb-3 form-check">
-                            {{ form.remember(class="form-check-input") }}
-                            {{ form.remember.label(class="form-check-label") }}
-                        </div>
+                        {{ render_field(form.password_confirm) }}
 
                         <div class="d-grid">
                             {{ form.submit(class="btn btn-primary btn-lg") }}
@@ -31,7 +30,7 @@
 
                     <div class="mt-3 text-center">
                         <small class="text-muted">
-                            Немає акаунта? <a href="{{ url_for('users_bp.register') }}">Зареєструватися</a>
+                            Вже маєте акаунт? <a href="{{ url_for('users_bp.login') }}">Увійти</a>
                         </small>
                     </div>
                 </div>

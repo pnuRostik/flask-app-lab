@@ -69,3 +69,9 @@
 2025-11-30 19:07:49,193 - app.users.views - INFO - New user registered and logged in: Ростислав1 (pomoju.boje2@gmail.com)
 2025-11-30 19:10:17,197 - app.users.views - INFO - New user registered and logged in: testuser (test@example.com)
 2025-11-30 19:10:30,895 - app.users.views - INFO - New user registered and logged in: testuser (test@example.com)
+2025-11-30 19:28:46,378 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:29:18,954 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:30:14,672 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:30:25,139 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:30:30,291 - app.users.views - INFO - Profile updated for user: Ростислав12
+2025-11-30 19:31:29,356 - app.users.views - INFO - Profile updated for user: Ростислав12

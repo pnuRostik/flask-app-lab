@@ -4,8 +4,168 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Profile Page</h2>
-    <p>Ласкаво просимо, {{ username }}!</p>
+    <h2>Профіль користувача</h2>
+
+    <!-- Profile Information Section -->
+    <div class="row mb-4">
+        <div class="col-md-4 text-center">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{ url_for('static', filename='images/profile_pics/' + profile_image) }}"
+                        alt="Profile Picture" class="img-thumbnail rounded-circle mb-3"
+                        style="width: 200px; height: 200px; object-fit: cover;"
+                        onerror="this.src='{{ url_for('static', filename='images/profile_default.jpg') }}'">
+                    <h4>{{ username }}</h4>
+                    <p class="text-muted">{{ email }}</p>
+                    {% if last_seen %}
+                    <small class="text-muted">Останній візит: {{ last_seen.strftime('%d.%m.%Y %H:%M') }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Інформація про профіль</h5>
+                </div>
+                <div class="card-body">
+                    {% if about_me %}
+                    <p><strong>Про себе:</strong></p>
+                    <p>{{ about_me }}</p>
+                    {% else %}
+                    <p class="text-muted">Інформація про себе не додана</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Account Form -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Оновити профіль</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="form_type" value="update_account">
+                        {{ update_form.hidden_tag() }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ update_form.username.label(class="form-label") }}
+                                    {{ update_form.username(class="form-control") }}
+                                    {% if update_form.username.errors %}
+                                    <div class="text-danger">
+                                        {% for error in update_form.username.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    {{ update_form.email.label(class="form-label") }}
+                                    {{ update_form.email(class="form-control") }}
+                                    {% if update_form.email.errors %}
+                                    <div class="text-danger">
+                                        {% for error in update_form.email.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ update_form.about_me.label(class="form-label") }}
+                                    {{ update_form.about_me(class="form-control") }}
+                                    {% if update_form.about_me.errors %}
+                                    <div class="text-danger">
+                                        {% for error in update_form.about_me.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    {{ update_form.picture.label(class="form-label") }}
+                                    {{ update_form.picture(class="form-control") }}
+                                    {% if update_form.picture.errors %}
+                                    <div class="text-danger">
+                                        {% for error in update_form.picture.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {{ update_form.submit(class="btn btn-primary") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Form -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Змінити пароль</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="form_type" value="change_password">
+                        {{ password_form.hidden_tag() }}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ password_form.old_password.label(class="form-label") }}
+                                    {{ password_form.old_password(class="form-control") }}
+                                    {% if password_form.old_password.errors %}
+                                    <div class="text-danger">
+                                        {% for error in password_form.old_password.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ password_form.password.label(class="form-label") }}
+                                    {{ password_form.password(class="form-control") }}
+                                    {% if password_form.password.errors %}
+                                    <div class="text-danger">
+                                        {% for error in password_form.password.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ password_form.password_confirm.label(class="form-label") }}
+                                    {{ password_form.password_confirm(class="form-control") }}
+                                    {% if password_form.password_confirm.errors %}
+                                    <div class="text-danger">
+                                        {% for error in password_form.password_confirm.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {{ password_form.submit(class="btn btn-primary") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Theme Selection -->
     <div class="mb-3">

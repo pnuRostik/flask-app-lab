@@ -75,3 +75,13 @@
 2025-11-30 19:30:25,139 - werkzeug - WARNING -  * Debugger is active!
 2025-11-30 19:30:30,291 - app.users.views - INFO - Profile updated for user: Ростислав12
 2025-11-30 19:31:29,356 - app.users.views - INFO - Profile updated for user: Ростислав12
+2025-11-30 19:34:04,830 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:34:08,262 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:41:16,455 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:42:48,046 - app.sport_events.views - INFO - Sport event created: Баскетбол Україхна Америка by user Ростислав12
+2025-11-30 19:43:21,583 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:43:28,090 - werkzeug - WARNING -  * Debugger is active!
+2025-11-30 19:43:45,735 - app.sport_events.views - INFO - Sport event updated: Баскетбол Україхна Америка by user Ростислав12
+2025-11-30 19:44:14,064 - app.users.views - INFO - User logged out: Ростислав12
+2025-11-30 19:44:15,714 - app.users.views - INFO - User logged in: Ростислав
+2025-11-30 19:45:03,069 - werkzeug - WARNING -  * Debugger is active!

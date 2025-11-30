@@ -72,11 +72,13 @@ def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flas
     # Import blueprints
     with app.app_context(): 
         from .users import users_bp
-        from .views import main_bp    
+        from .views import main_bp
+        from .sport_events import sport_events_bp
         from .models import User
         # Register blueprints
         app.register_blueprint(main_bp)
         app.register_blueprint(users_bp)
+        app.register_blueprint(sport_events_bp)
 
     @app.errorhandler(404)
     def page_not_found(e):
